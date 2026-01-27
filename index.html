@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARENA FORGE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app-container" class="hide-objects">
+    <!-- Header -->
+    <div id="header">
+      <h1>ARENA FORGE</h1>
+      <div id="header-actions">
+        <button class="btn" id="undo" title="Undo last action (Ctrl+Z) - Up to 50 steps">↶ UNDO</button>
+        <button class="btn" id="redo" title="Redo previously undone action (Ctrl+Shift+Z)">↷ REDO</button>
+        <button class="btn danger" id="clear-scene" title="Delete all objects from the scene (with confirmation)">✕ CLEAR</button>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div id="toolbar">
+      <button class="tool-btn active" id="tool-select" title="Select Mode (Esc) - Click objects to select, Shift+Click for multi-select, drag to move">
+        <span>⌖</span>
+      </button>
+      <button class="tool-btn" id="tool-add" title="Add Tool - Open object panel to pick shapes to place">
+        <span>✚</span>
+      </button>
+      <button class="tool-btn" id="tool-move-x" title="Move Horizontal (G) - Translate selected objects along the ground (XZ plane)">
+        <span>↔</span>
+      </button>
+      <button class="tool-btn" id="tool-move-y" title="Move Vertical (V) - Translate selected objects vertically (Y axis)">
+        <span>↕</span>
+      </button>
+      <button class="tool-btn" id="tool-rotate" title="Rotate Tool (R) - Rotate selected objects around axes using transform gizmo">
+        <span>⟲</span>
+      </button>
+      
+      <div class="separator"></div>
+      
+      <button class="tool-btn" id="toggle-grid" title="Toggle Grid Visibility - Show/hide the ground reference grid" style="font-size: 16px;">
+        <span>#</span>
+      </button>
+      <button class="tool-btn active" id="toggle-snap" title="Toggle Snap to Grid - Enable/disable automatic grid alignment when placing or moving objects">
+        <span>⊞</span>
+      </button>
+    </div>
+
+    <!-- Object Panel -->
+    <div id="object-panel">
+      <h2>▸ OBJECTS</h2>
+      
+      <div class="object-category">
+        <h3>// BASIC SHAPES</h3>
+        <div class="object-grid">
+          <button class="object-btn" data-type="box" title="Cube - Standard 2x2x2 box, good for cover and obstacles">CUBE</button>
+          <button class="object-btn" data-type="cylinder" title="Cylinder - Round pillar, 1 unit radius, 3 units tall">CYLINDER</button>
+          <button class="object-btn" data-type="platform" title="Platform - Large flat surface 5x0.5x5, good for floors and elevated areas">PLATFORM</button>
+          <button class="object-btn" data-type="wall" title="Wall - Vertical barrier 0.3x3x5, thin and tall for boundaries">WALL</button>
+        </div>
+      </div>
+
+      <div class="object-category">
+        <h3>// GAMEPLAY</h3>
+        <div class="object-grid">
+          <button class="object-btn" data-type="ramp" title="Ramp - Angled platform 4x0.3x6, connect different elevations">RAMP</button>
+          <button class="object-btn" data-type="box" title="Cover - Standard cube sized for player cover">COVER</button>
+        </div>
+      </div>
+
+      <div class="object-category">
+        <h3>// DECORATIVE</h3>
+        <div class="object-grid">
+          <button class="object-btn" data-type="emissive_strip" title="Neon Strip - Glowing strip 0.2x0.1x3 for visual accents and atmosphere">NEON STRIP</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div id="canvas-container">
+      <div id="viewport-overlay">
+        <div style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">⊡ VIEWPORT</div>
+        <div class="hotkey">
+          <kbd>LMB</kbd> Select/Place<br>
+          <kbd>LMB Drag</kbd> Move Selected<br>
+          <kbd>Shift+LMB</kbd> Multi-Select<br>
+          <kbd>RMB Drag</kbd> Rotate View<br>
+          <kbd>Scroll</kbd> Scale Selected (if selected)<br>
+          <kbd>Scroll</kbd> Zoom View (if none selected)<br>
+          <kbd>G/V</kbd> Move H/V<br>
+          <kbd>R</kbd> Rotate<br>
+          <kbd>Del</kbd> Delete<br>
+          <kbd>Ctrl+D</kbd> Duplicate<br>
+          <kbd>Ctrl+A</kbd> Select All<br>
+          <kbd>Esc</kbd> Deselect
+        </div>
+      </div>
+
+      <!-- Floating Context Toolbar -->
+      <div id="context-toolbar" class="hidden">
+        <button class="context-btn" id="context-move-x" title="Move H (G)"><span>↔</span></button>
+        <button class="context-btn" id="context-move-y" title="Move V (V)"><span>↕</span></button>
+        <button class="context-btn" id="context-rotate" title="Rotate (R)"><span>⟲</span></button>
+        <div class="context-separator"></div>
+        <button class="context-btn danger" id="context-delete" title="Delete (Del)"><span>✕</span></button>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div id="right-sidebar">
+      <div id="properties-section" class="hidden">
+        <h2>▸ PROPERTIES</h2>
+        
+        <div class="info-display">
+          <div class="label">TYPE</div>
+          <div class="value" id="object-type">—</div>
+          <div class="label" style="margin-top: 8px;">ID</div>
+          <div class="value" id="object-id" style="font-size: 9px; word-break: break-all;">—</div>
+        </div>
+
+        <div class="property-section">
+          <h3>// TRANSFORM</h3>
+          
+          <div class="property-row">
+            <label title="X coordinate (left/right position)">X</label>
+            <input type="number" id="pos-x" step="0.1" value="0" title="X position in world space">
+          </div>
+          <div class="property-row">
+            <label title="Y coordinate (up/down position)">Y</label>
+            <input type="number" id="pos-y" step="0.1" value="0" title="Y position (height) in world space">
+          </div>
+          <div class="property-row">
+            <label title="Z coordinate (forward/back position)">Z</label>
+            <input type="number" id="pos-z" step="0.1" value="0" title="Z position in world space">
+          </div>
+        </div>
+
+        <div class="property-section">
+          <h3>// ROTATION</h3>
+          
+          <div class="property-row">
+            <label title="X rotation (degrees)">ROTX</label>
+            <input type="number" id="rot-x" step="15" value="0" title="X rotation in degrees">
+          </div>
+          <div class="property-row">
+            <label title="Y rotation (degrees)">ROTY</label>
+            <input type="number" id="rot-y" step="15" value="0" title="Y rotation in degrees">
+          </div>
+          <div class="property-row">
+            <label title="Z rotation (degrees)">ROTZ</label>
+            <input type="number" id="rot-z" step="15" value="0" title="Z rotation in degrees">
+          </div>
+        </div>
+
+        <div class="property-section">
+          <h3>// DIMENSIONS</h3>
+          
+          <div class="property-row">
+            <label title="Object width (X axis)">WIDTH</label>
+            <input type="number" id="size-width" step="0.1" value="2" title="Width in units (affects X scale)">
+          </div>
+          <div class="property-row">
+            <label title="Object height (Y axis)">HEIGHT</label>
+            <input type="number" id="size-height" step="0.1" value="2" title="Height in units (affects Y scale)">
+          </div>
+          <div class="property-row">
+            <label title="Object depth (Z axis)">DEPTH</label>
+            <input type="number" id="size-depth" step="0.1" value="2" title="Depth in units (affects Z scale)">
+          </div>
+        </div>
+
+        <div class="property-section">
+          <h3>// MATERIAL</h3>
+          
+          <select id="material-select" title="Choose visual material for this object">
+            <option value="floor">Floor - Dark base surface</option>
+            <option value="obstacle">Obstacle - Standard cover material</option>
+            <option value="wall">Wall - Vertical barrier material</option>
+            <option value="platform">Platform - Elevated surface material</option>
+            <option value="metalTrim">Metal Trim - Shiny metallic accents</option>
+            <option value="emissiveCyan">Emissive Cyan - Glowing blue/cyan</option>
+            <option value="emissiveOrange">Emissive Orange - Glowing orange</option>
+            <option value="emissiveMagenta">Emissive Magenta - Glowing purple/magenta</option>
+          </select>
+        </div>
+
+        <div class="property-section">
+          <h3>// ACTIONS</h3>
+          
+          <button class="btn" id="duplicate-object" style="width: 100%; margin-bottom: 8px;" title="Create a copy of selected object(s) offset by 2 units (Ctrl+D)">
+            ⎘ DUPLICATE
+          </button>
+          <button class="btn danger" id="delete-object" style="width: 100%;" title="Delete selected object(s) permanently (Delete key)">
+            ✕ DELETE
+          </button>
+        </div>
+      </div>
+
+      <div id="scene-tree-section">
+        <div class="scene-tree-container">
+          <h2>▸ SCENE TREE</h2>
+          <div id="scene-tree">
+            <!-- Populated by LevelEditor.js -->
+            <div class="empty-tree-msg">No objects in scene</div>
+          </div>
+        </div>
+
+        <div class="scene-settings-container">
+          <h2>▸ SCENE SETTINGS</h2>
+          <div class="property-section">
+            <div class="setting-row">
+              <label for="map-size-input">MAP SIZE</label>
+              <input type="number" id="map-size-input" value="100" min="10" max="200" step="10">
+            </div>
+
+            <div class="setting-row">
+              <label for="skybox-toggle">SKYBOX</label>
+              <input type="checkbox" id="skybox-toggle">
+            </div>
+            
+            <div class="sidebar-actions">
+              <button class="btn" id="export-scene" title="Export level as JSON file">⬇ EXPORT</button>
+              <button class="btn" id="import-scene" title="Import a level JSON file">⬆ IMPORT</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer">
+      <div id="footer-stats">
+        <span id="object-count">Objects: 0</span>
+        <span id="selected-info">Selected: None</span>
+      </div>
+      <div style="color: var(--accent-cyan);">
+        ARENA FORGE v1.0.0
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+
+  <script>
+    // Update footer stats
+    function updateStats() {
+      const objectCount = window.editor ? window.editor.objects.length : 0;
+      document.getElementById('object-count').textContent = `Objects: ${objectCount}`;
+    }
+
+    window.addEventListener('objectAdded', updateStats);
+    window.addEventListener('objectDeleted', updateStats);
+    
+    window.addEventListener('objectSelected', (e) => {
+      const detail = e.detail;
+      const selectedCount = detail.selectedCount || 1;
+      
+      if (selectedCount > 1) {
+        document.getElementById('selected-info').textContent = `Selected: ${selectedCount} objects`;
+      } else {
+        const objType = detail.object ? detail.object.data.type : (detail.data ? detail.data.type : 'object');
+        document.getElementById('selected-info').textContent = `Selected: ${objType}`;
+      }
+    });
+    
+    window.addEventListener('objectDeselected', () => {
+      document.getElementById('selected-info').textContent = 'Selected: None';
+    });
+
+    setInterval(updateStats, 1000);
+  </script>
+</body>
+</html>
