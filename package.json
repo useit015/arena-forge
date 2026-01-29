@@ -3,18 +3,35 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Professional level editor for creating custom arena maps with Three.js",
+  "author": "Oussama Nahiz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/useit015/arena-forge.git"
+  },
+  "keywords": [
+    "three.js",
+    "level-editor",
+    "gamedev"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "editor": "vite --open /editor.html"
+    "editor": "vite --open",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
-    "nipplejs": "^0.10.2",
-    "three": "^0.170.0",
-    "undo-manager": "^1.1.1"
+    "signals": "^1.0.0",
+    "three": "^0.170.0"
   },
   "devDependencies": {
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.2.0",
+    "prettier": "^3.8.1",
     "vite": "^5.0.0"
   }
 }

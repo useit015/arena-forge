@@ -8,6 +8,7 @@ A powerful, modern level editor for creating custom arena maps for your action g
 ## Overview
 
 Arena Forge is a professional-grade level editor that allows you to:
+
 - **Create custom arena layouts** with an intuitive visual interface
 - **Place and manipulate objects** using industry-standard 3D tools
 - **Export/import levels** as JSON for use in your game
@@ -20,16 +21,33 @@ Arena Forge is a professional-grade level editor that allows you to:
 
 1. Extract all files to your project directory
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Run the editor:
+
 ```bash
 npm run dev
 ```
 
-4. Open the editor at `http://localhost:5173/editor.html`
+4. Open the editor at `http://localhost:5173/`
+
+### Development
+
+To run linting and formatting:
+
+```bash
+# Lint code
+npm run lint
+
+# tailored fix
+npm run lint:fix
+
+# Format code
+npm run format
+```
 
 ### First Steps
 
@@ -41,12 +59,14 @@ npm run dev
 ## Interface Layout
 
 ### Header Bar
+
 - **UNDO/REDO**: Navigate through your edit history (Ctrl+Z / Ctrl+Shift+Z)
 - **EXPORT**: Save your level as a JSON file
 - **IMPORT**: Load a previously saved level
 - **CLEAR**: Delete all objects (with confirmation)
 
 ### Toolbar (Left Side)
+
 - **Select Tool** (⌖): Click to select objects
 - **Move Tool** (↔): Translate objects along X/Y/Z axes (Hotkey: G)
 - **Rotate Tool** (⟲): Rotate objects (Hotkey: R)
@@ -55,64 +75,76 @@ npm run dev
 - **Snap to Grid** (⊞): Enable/disable grid snapping
 
 ### Object Panel
+
 Browse and select objects to place:
 
 **Basic Shapes**
+
 - CUBE: Standard box/cover element
 - CYLINDER: Round pillars or obstacles
 - PLATFORM: Large flat surface
 - WALL: Vertical barriers
 
 **Gameplay**
+
 - RAMP: Angled platforms for elevation changes
 - COVER: Medium-sized tactical cover
 
 **Decorative**
+
 - NEON STRIP: Emissive strips for visual flair
 
 ### Properties Panel (Right Side)
+
 Appears when an object is selected:
 
 **Transform**
+
 - X, Y, Z position coordinates
 
 **Dimensions**
+
 - Width, Height, Depth (actual size in units)
 
 **Material**
+
 - Choose from 8 different materials
 - Includes emissive options for glowing elements
 
 **Actions**
+
 - Duplicate selected object
 - Delete selected object
 
 ### Footer
+
 - **Object Count**: Total objects in scene
 - **Selected Info**: Currently selected object type
 
 ## Controls & Shortcuts
 
 ### Mouse Controls
-| Action | Control |
-|--------|---------|
-| Rotate Camera | Right Mouse + Drag |
-| Pan Camera | Middle Mouse + Drag |
-| Zoom | Scroll Wheel |
-| Select Object | Left Click |
-| Place Object | Left Click (in Add mode) |
+
+| Action        | Control                  |
+| ------------- | ------------------------ |
+| Rotate Camera | Right Mouse + Drag       |
+| Pan Camera    | Middle Mouse + Drag      |
+| Zoom          | Scroll Wheel             |
+| Select Object | Left Click               |
+| Place Object  | Left Click (in Add mode) |
 
 ### Keyboard Shortcuts
-| Shortcut | Action |
-|----------|--------|
-| **ESC** | Select tool / Deselect object |
-| **G** | Move tool |
-| **R** | Rotate tool |
-| **S** | Scale tool |
-| **DELETE** | Delete selected object |
-| **CTRL + D** | Duplicate selected object |
-| **CTRL + Z** | Undo |
-| **CTRL + SHIFT + Z** | Redo |
+
+| Shortcut             | Action                        |
+| -------------------- | ----------------------------- |
+| **ESC**              | Select tool / Deselect object |
+| **G**                | Move tool                     |
+| **R**                | Rotate tool                   |
+| **S**                | Scale tool                    |
+| **DELETE**           | Delete selected object        |
+| **CTRL + D**         | Duplicate selected object     |
+| **CTRL + Z**         | Undo                          |
+| **CTRL + SHIFT + Z** | Redo                          |
 
 ## Workflow Guide
 
@@ -150,17 +182,20 @@ Appears when an object is selected:
 ### Best Practices
 
 **Layout Design**
+
 - Create clear sight lines for combat
 - Provide multiple paths between areas
 - Balance open spaces with tight corridors
 - Add verticality for tactical depth
 
 **Performance**
+
 - Keep object count reasonable (< 200 for mobile, < 500 for desktop)
 - Reuse similar shapes rather than creating unique ones
 - Use larger platforms instead of many small pieces
 
 **Gameplay**
+
 - Leave room for sliding mechanics
 - Ensure cover has gaps for throwing
 - Test movement flow before finalizing
@@ -208,23 +243,28 @@ loader.loadLevel(levelData);
 ## Advanced Features
 
 ### Grid Snapping
+
 - Toggle with the Snap button or in properties
 - Adjustable grid size (default: 1 unit)
 - Helps align objects perfectly
 
 ### Undo/Redo System
+
 - Unlimited undo/redo (up to 50 actions)
 - Preserves all object properties
 - Works with all modifications
 
 ### Object Duplication
+
 - Select an object
 - Press Ctrl+D or click DUPLICATE
 - Creates a copy offset from the original
 - Preserves all properties including material
 
 ### Material System
+
 8 built-in materials:
+
 - **Floor**: Dark base surface
 - **Obstacle**: Standard cover
 - **Wall**: Vertical barriers
@@ -235,7 +275,9 @@ loader.loadLevel(levelData);
 - **Emissive Magenta**: Glowing magenta
 
 ### Transform Controls
+
 Uses Three.js TransformControls for industry-standard manipulation:
+
 - **Translate**: Drag arrows to move along axes
 - **Rotate**: Drag circles to rotate around axes
 - **Scale**: Drag boxes to scale along axes
@@ -243,21 +285,25 @@ Uses Three.js TransformControls for industry-standard manipulation:
 ## Troubleshooting
 
 ### Objects Not Appearing
+
 - Check if object is below ground (Y position)
 - Verify grid is visible
 - Try zooming out (scroll wheel)
 
 ### Can't Select Objects
+
 - Make sure Select tool is active (press ESC)
 - Click directly on the object geometry
 - Disable Transform Controls (press ESC)
 
 ### Export Not Working
+
 - Check browser console for errors
 - Verify you have objects in the scene
 - Try a different browser
 
 ### Performance Issues
+
 - Reduce object count
 - Disable shadows in renderer settings
 - Lower shadow map resolution
@@ -274,41 +320,53 @@ const editor = new LevelEditor(scene, camera, renderer);
 #### Methods
 
 **addObject(type, position)**
+
 - Add a new object to the scene
 - Returns: EditorObject
 
 **deleteObject(editorObject)**
+
 - Remove an object from the scene
 
 **selectObject(editorObject)**
+
 - Select an object for editing
 
 **deselectObject()**
+
 - Clear current selection
 
 **duplicateObject(editorObject)**
+
 - Create a copy of an object
 
 **exportScene()**
+
 - Returns: JSON string of entire scene
 
 **importScene(jsonString)**
+
 - Load a scene from JSON
 - Returns: boolean (success)
 
 **clearScene()**
+
 - Remove all objects (with confirmation)
 
 **undo()**
+
 - Undo last action
 
 **redo()**
+
 - Redo previously undone action
 
 **toggleGrid(visible)**
+
 - Show/hide ground grid
 
 **toggleSnapToGrid()**
+
 - Enable/disable grid snapping
 - Returns: boolean (new state)
 
@@ -324,7 +382,7 @@ const editor = new LevelEditor(scene, camera, renderer);
 
 ### Adding New Object Types
 
-Edit `LevelEditor.js` in the `addObject()` method:
+Edit `src/core/LevelEditor.js` in the `addObject()` method:
 
 ```javascript
 case 'my_object':
@@ -334,7 +392,7 @@ case 'my_object':
   break;
 ```
 
-Then add a button in `editor.html`:
+Then add a button in `index.html`:
 
 ```html
 <button class="object-btn" data-type="my_object">MY OBJECT</button>
@@ -342,14 +400,14 @@ Then add a button in `editor.html`:
 
 ### Adding New Materials
 
-In `LevelEditor.js` `createMaterialsLibrary()`:
+In `src/core/LevelEditor.js` `createMaterialsLibrary()`:
 
 ```javascript
 myMaterial: new THREE.MeshStandardMaterial({
   color: 0x00ff00,
   roughness: 0.5,
-  metalness: 0.5
-})
+  metalness: 0.5,
+});
 ```
 
 ### Custom Tools
@@ -369,6 +427,7 @@ Extend the Transform Controls or add new interaction modes in the `onPointerDown
 ## Support & Feedback
 
 For issues or suggestions:
+
 1. Check the browser console for errors
 2. Verify all files are correctly installed
 3. Test in latest Chrome/Firefox
@@ -376,7 +435,7 @@ For issues or suggestions:
 
 ## License
 
-Free to use for game development and prototyping.
+MIT License.
 
 ---
 
